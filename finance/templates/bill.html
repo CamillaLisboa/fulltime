@@ -1,0 +1,108 @@
+<style>
+    *{
+    margin: 0;
+    padding: 0;
+    }
+    body{
+        width: 100%;
+        height: 100%;
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(-45deg, #ffce51, #ff7253, #fd5754 );
+    }
+    .title{
+        font-size: 1.8em;
+        margin-bottom: 10%;
+    }
+    .th,td{
+        width: min-content;
+        border-radius: 22px;
+        border: 2px #fff solid;
+        padding: 5px;
+        margin: 2px 2px 12px -5px;
+    }
+    .footer {
+    font-family: 'Arial', sans-serif;
+    background-color: #e5e5e5; /* Altere a cor conforme necessário */
+    color: #333;
+    text-align: center;
+    padding: 10px 0;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+  }
+  .navbar-header {
+    font-family: 'Arial', sans-serif;
+    background-color:transparent; /* Cor de fundo cinza escuro */
+    color: #fff; /* Cor do texto branco */
+    padding: 20px; /* Espaçamento interno */
+  }
+  .navbar-menu-header a {
+    color: #fff; /* Cor do texto branco */
+    margin-right: 20px; /* Espaçamento entre os itens do menu */
+    text-decoration: none; /* Remover sublinhado dos links */
+    font-weight: bold; /* Negrito para destacar os links */
+  }
+  .table{
+    text-align: center;
+  }
+</style>
+  
+<header class="navbar navbar-header navbar-header-fixed">
+    <div class="container-fluid">
+      <a href="" id="mainMenuOpen" class="burger-menu"><i data-feather="menu"></i></a>
+      <div id="navbarMenu" class="navbar-menu-wrapper">
+        <div class="navbar-menu-header">
+            <a href="{% url 'finance:index' %}" class="df-logo"><span>Home</span></a>
+            <a href="{% url 'finance:person' %}" class="df-logo"><span>Pessoas</span></a>
+            <a href="{% url 'finance:bill' %}"><span>Contas</span></a>
+            <a href="{% url 'finance:person_create' %}" class="df-logo"><span>Cadastrar Pessoa</span></a>
+            <a href="{% url 'finance:bill_create' %}" class="df-logo"><span>Cadastrar Conta</span></a>
+        </div>
+      </div> 
+    </div>
+</header>
+
+<body>
+    {% block content %}
+    <div id="table" class="full-width">
+            
+        <table class="table">
+            <thead class="body-title">
+                <tr class= "bg-gray-200 p-2">
+                    <th>Nome</th>
+                    <th>Valor</th>
+                    <th>Data de Vencimento</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in object_list %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>R$ {{ item.price }}</td>
+                    <td>{{ item.due_date }}</td>
+                    <td class="action-cell">
+                        <a class="btn btn-warning"title="Editar"
+                            href="{% url 'finance:bill_update' item.id %}">Editar
+                        </a>
+                        <a class="btn btn-danger"title="Deletar"
+                            href="{% url 'finance:bill_delete' item.id %}" style="margin-left: 15px;">Deletar
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div id="btn">
+            <a class="btn btn-secondary" style="margin-left: 10px" href="{% url 'finance:index' %}">Voltar</a>
+        </div>
+    </div>
+    {% endblock content %}
+</body>
+   
+<div id="map"></div>
+<footer class="footer bg-info">
+    <div class="w-100">
+    <span>&copy; 2024 Camilla Pinto  </span>
+    </div>
+</footer>
