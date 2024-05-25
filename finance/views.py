@@ -36,7 +36,7 @@ class Index(ListView):
         finance_data.append({
             'total_income': round(total_income, 2),
             'total_people': total_people,
-            'total_bill': total_bills,
+            'total_bill': round(total_bills, 2),
             'net_income': round(net_income, 2),
                              })
 
