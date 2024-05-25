@@ -1,62 +1,120 @@
 from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
-
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework import status
+from django.urls import reverse_lazy
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
 from .models import Person, Bill
-from .serializers import PersonSerializer, BillSerializer
+from .forms import PersonForm, BillForm
 
-import json
 
-@api_view(['GET','POST','PUT'])
-def get_person(request):
-    if request.method == 'GET':
-        try:
-            person = Person.objects.all()
+class Index(ListView):
+    model=Person
+    template_name = 'index.html'
 
-            serializer = PersonSerializer(person, many=True)
-            return Response(serializer.data)
-        except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-    
-    if request.method == 'POST':
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['finance_data'] = self.get_finance_data()
+        return context
 
-        new_person = request.data
+    def get_finance_data(self):
+        # Obtém as todas as pessoas
+        people = Person.objects.all()
+        finance_data = []
 
-        serializer = PersonSerializer(data = new_person)
+        total_income = 0
+        total_people = 0
+        for person in people:
+            total_income+= person.income
+            total_people+=1
 
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        
-    if request.method == 'PUT':
-        id = request.data['id']
-        updated_person = Person.objects.get(id=id)
+        total_bills = 0
 
-        serializer = PersonSerializer(updated_person, data=request.data)
-    return Response(status=status.HTTP_404_NOT_FOUND)
-   
-   
-@api_view(['GET','POST','PUT'])
-def get_bill(request):
-    if request.method == 'GET':
-        bill = Bill.objects.all()
+        bills = Bill.objects.all()
+        for bill in bills:
+            total_bills+= bill.price
+        net_income = total_income - total_bills
 
-        serializer = BillSerializer(bill, many=True)
-        return Response(serializer.data)
-    
-    elif request.method == 'POST':
+        finance_data.append({
+            'total_income': round(total_income, 2),
+            'total_people': total_people,
+            'total_bill': total_bills,
+            'net_income': round(net_income, 2),
+                             })
 
-        new_bill = request.data
-
-        serializer = BillSerializer(data = new_bill)
-
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(status=status.HTTP_404_NOT_FOUND)
+        return finance_data
     
 
+class PersonList(ListView):
+    model = Person
+    template_name = 'person.html'
+
+    
+class PersonCreate(CreateView):
+    model = Person
+    template_name = 'person_create.html'
+    success_url = reverse_lazy('finance:person')
+    form_class = PersonForm
+
+    def form_valid(self, form):
+        return super().form_valid(form)
+    
+    def get_form_kwargs(self):
+        kwargs = super(PersonCreate, self).get_form_kwargs()
+        return kwargs
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+
+class PersonUpdate(UpdateView):
+    model = Person
+    template_name = 'person_update.html'
+    fields = ['name', 'doc', 'income']
+    success_url = reverse_lazy('finance:person')
+
+
+class PersonDelete(DeleteView):
+    model = Person
+    template_name = 'person_delete.html'
+    
+    def get_success_url(self):
+        return reverse_lazy("finance:person")
+    
+
+class BillList(ListView):
+    model = Bill
+    template_name = 'bill.html'
+
+
+class BillCreate(CreateView):
+    model = Bill
+    template_name = 'bill_create.html'
+    success_url = reverse_lazy('finance:bill')
+    form_class = BillForm
+
+    def form_valid(self, form):
+        return super().form_valid(form)
+    
+    def get_form_kwargs(self):
+        kwargs = super(BillCreate, self).get_form_kwargs()
+        return kwargs
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context  
+
+
+class BillUpdate(UpdateView):
+    model = Bill
+    template_name = 'bill_update.html'
+    fields = ['name', 'price', 'due_date']
+    success_url = reverse_lazy('finance:bill')
+
+
+class BillDelete(DeleteView):
+    model = Bill
+    template_name = 'bill_delete.html'
+    
+    def get_success_url(self):
+        return reverse_lazy("finance:bill")
 
