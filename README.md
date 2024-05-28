@@ -21,7 +21,7 @@ O Finance é um app para controle de finanças de um ambiente residencial, onde 
 5. Crie um superusuário: `python manage.py createsuperuser`
 6. Inicie o servidor: `python manage.py runserver`
 
-Acesse a aplicação em (http://localhost:8000/) e o painel de administração em (http://localhost:8000/admin/).
+Acesse a aplicação em (http://localhost:8000/api/index) e o painel de administração em (http://localhost:8000/admin/).
 
 ## Cadastro de Pessoas
 1. Todos os campos são obrigatórios
